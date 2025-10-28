@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXE | Luxury Handbags</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.4/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.4/dist/ScrollTrigger.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
+        
+        :root {
+            --gold: #D4AF37;
+            --beige: #F5F5DC;
+            --dark: #0F0F0F;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--dark);
+            color: var(--beige);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .gold-text {
+            color: var(--gold);
+        }
+        
+        .gold-border {
+            border-color: var(--gold);
+        }
+        
+        .bg-gold {
+            background-color: var(--gold);
+        }
+        
+        .bg-beige {
+            background-color: var(--beige);
+        }
+        
+        .bg-dark {
+            background-color: var(--dark);
+        }
+        
+        .glow {
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.7);
+        }
+        
+        .btn-glow {
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.7);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-glow:hover {
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.9);
+            transform: translateY(-2px);
+        }
+        
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        .floating-2 {
+            animation: floating 8s ease-in-out infinite 2s;
+        }
+        
+        .floating-3 {
+            animation: floating 7s ease-in-out infinite 1s;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .parallax {
+            transition: transform 0.1s ease-out;
+        }
+        
+        .product-card {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-10px) scale(1.02);
+        }
+        
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.7));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+        
+        .product-card:hover::before {
+            opacity: 1;
+        }
+        
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--gold);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .section {
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bg-pattern {
+            background-image: radial-gradient(rgba(212, 175, 55, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0) translateX(-50%);}
+            40% {transform: translateY(-20px) translateX(-50%);}
+            60% {transform: translateY(-10px) translateX(-50%);}
+        }
+        
+        .mood-card {
+            transition: all 0.3s ease;
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+        }
+        
+        .mood-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 15, 15, 0.7);
+            transition: all 0.3s ease;
+        }
+        
+        .mood-card:hover::before {
+            background: rgba(15, 15, 15, 0.4);
+        }
+        
+        .mood-card:hover .mood-title {
+            transform: translateY(-10px);
+        }
+        
+        .mood-title {
+            transition: all 0.3s ease;
+        }
+        
+        .gradient-overlay {
+            background: linear-gradient(to bottom, rgba(15,15,15,0.8) 0%, rgba(15,15,15,0) 20%, rgba(15,15,15,0) 80%, rgba(15,15,15,0.8) 100%);
+        }
+    </style>
+</head>
+<body class="relative">
+    <!-- 3D Background Elements -->
+    <div id="floating-bags">
+        <img src="6d2fdf2704fdc52232976b4ba3d51c87.jpg" alt="" class="absolute w-32 opacity-20 floating" style="top: 20%; left: 10%;">
+        <img src="./7857a6a7ed12e9a93ac225bc430385fc.jpg" alt="" class="absolute w-40 opacity-15 floating-2" style="top: 60%; left: 80%;">
+        <img src="9992b3ca20621f2a6c8db266ad9bc479.jpg" alt="" class="absolute w-28 opacity-25 floating-3" style="top: 30%; left: 75%;">
+        <img src="f6585f49eb6e37ccb53a6e20cc4b2960.jpg" alt="" class="absolute w-24 opacity-15 floating-2" style="top: 80%; left: 15%;">
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-black bg-opacity-70 backdrop-filter backdrop-blur-lg py-4 px-8 flex justify-between items-center">
+        <div class="text-2xl font-bold gold-text">LUXE</div>
+        <div class="hidden md:flex space-x-8">
+            <a href="#home" class="nav-link text-beige hover:text-gold">Home</a>
+            <a href="#new" class="nav-link text-beige hover:text-gold">New Arrivals</a>
+            <a href="#limited" class="nav-link text-beige hover:text-gold">Limited Edition</a>
+            <a href="#mood" class="nav-link text-beige hover:text-gold">Shop by Mood</a>
+            <a href="#about" class="nav-link text-beige hover:text-gold">About</a>
+        </div>
+        <div class="flex items-center space-x-4">
+            <i class="fas fa-search text-beige hover:text-gold cursor-pointer"></i>
+            <i class="fas fa-user text-beige hover:text-gold cursor-pointer"></i>
+            <i class="fas fa-shopping-bag text-beige hover:text-gold cursor-pointer"></i>
+            <div class="md:hidden">
+                <i class="fas fa-bars text-beige hover:text-gold cursor-pointer"></i>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section with 3D Bag -->
+    <section id="home" class="section flex items-center justify-center relative overflow-hidden bg-pattern">
+        <div id="canvas-container"></div>
+        <div class="container mx-auto px-6 z-10 text-center">
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 gold-text glow">ELEVATE YOUR STYLE</h1>
+            <p class="text-xl md:text-2xl mb-12 max-w-2xl mx-auto">Discover the epitome of luxury with our exquisite collection of handcrafted designer handbags.</p>
+            <button class="btn-glow bg-gold text-dark font-bold py-4 px-12 rounded-full text-lg hover:bg-opacity-90 transition-all duration-300">
+                SHOP NOW
+            </button>
+        </div>
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down text-gold text-2xl"></i>
+        </div>
+    </section>
+    
+    <!-- New Arrivals -->
+    <section id="new" class="section py-20 relative gradient-overlay">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold gold-text">New Arrivals</h2>
+                <a href="#" class="text-beige hover:text-gold flex items-center">
+                    View All <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <!-- Product 1 -->
+                <div class="product-card relative rounded-lg overflow-hidden group">
+                    <img src="./6d2fdf2704fdc52232976b4ba3d51c87.jpg" alt="New Arrival Bag 1" class="w-full h-96 object-cover">
+                    <div class="absolute bottom-0 left-0 right-0 p-6 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <h3 class="text-xl font-bold text-beige mb-2">Serena Crossbody</h3>
+                        <p class="text-gold mb-4">$1,850</p>
+                       <button class="bg-gold text-dark py-2 px-6 rounded-full font-medium" onclick="openOrderPage('Serena Crossbody', 1850)">Add to Cart</button>
+
+                    </div>
+                    <div class="absolute top-4 right-4 z-10">
+                        <span class="bg-gold text-dark text-xs font-bold px-3 py-1 rounded-full">NEW</span>
+                    </div>
+                </div>
+                
+                <!-- Product 2 -->
+                <div class="product-card relative rounded-lg overflow-hidden group">
+                    <img src="./7857a6a7ed12e9a93ac225bc430385fc.jpg" alt="New Arrival Bag 2" class="w-full h-96 object-cover">
+                    <div class="absolute bottom-0 left-0 right-0 p-6 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <h3 class="text-xl font-bold text-beige mb-2">Elena Tote</h3>
+                        <p class="text-gold mb-4">$2,250</p>
+                        <button class="bg-gold text-dark py-2 px-6 rounded-full font-medium" onclick="openOrderPage('Serena Crossbody', 1850)">Add to Cart</button>
+
+                    </div>
+                    <div class="absolute top-4 right-4 z-10">
+                        <span class="bg-gold text-dark text-xs font-bold px-3 py-1 rounded-full">NEW</span>
+                    </div>
+                </div>
+                
+                <!-- Product 3 -->
+                <div class="product-card relative rounded-lg overflow-hidden group">
+                    <img src="9992b3ca20621f2a6c8db266ad9bc479.jpg" alt="New Arrival Bag 3" class="w-full h-96 object-cover">
+                    <div class="absolute bottom-0 left-0 right-0 p-6 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <h3 class="text-xl font-bold text-beige mb-2">Luna Clutch</h3>
+                        <p class="text-gold mb-4">$1,450</p>
+                        <button class="bg-gold text-dark py-2 px-6 rounded-full font-medium" onclick="openOrderPage('Serena Crossbody', 1850)">Add to Cart</button>
+
+                    </div>
+                    <div class="absolute top-4 right-4 z-10">
+                        <span class="bg-gold text-dark text-xs font-bold px-3 py-1 rounded-full">NEW</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Limited Edition -->
+    <section id="limited" class="section py-20 bg-black bg-opacity-50 relative">
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-black via-transparent to-black z-0"></div>
+            <img src="./background.jpg" alt="" class="w-full h-full object-cover opacity-20">
+        </div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl md:text-5xl font-bold gold-text mb-4">Limited Edition</h2>
+                <p class="text-xl max-w-3xl mx-auto">Exclusive pieces crafted in limited quantities for the discerning collector.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="relative">
+                    <img src="./f6585f49eb6e37ccb53a6e20cc4b2960.jpg" alt="Limited Edition Bag" class="w-full max-w-lg mx-auto floating">
+                    <div class="absolute -bottom-10 -left-10 w-32 h-32 border-2 border-gold rounded-full opacity-30"></div>
+                    <div class="absolute -top-10 -right-10 w-40 h-40 border-2 border-gold rounded-full opacity-20"></div>
+                </div>
+                
+                <div>
+                    <h3 class="text-3xl font-bold gold-text mb-6">The Celestial Collection</h3>
+                    <p class="text-beige mb-6">Each piece in this collection is handcrafted with genuine 24k gold thread embroidery and features rare celestial gemstones. Only 50 pieces will ever be made worldwide.</p>
+                    <ul class="mb-8 space-y-3">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-gold mr-3"></i>
+                            <span>Hand-stitched by master artisans</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-gold mr-3"></i>
+                            <span>Genuine Italian leather</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-gold mr-3"></i>
+                            <span>24k gold-plated hardware</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-gold mr-3"></i>
+                            <span>Numbered certificate of authenticity</span>
+                        </li>
+                    </ul>
+                    <div class="flex flex-wrap gap-4">
+                        <button class="btn-glow bg-gold text-dark font-bold py-3 px-8 rounded-full" onclick="openOrderPage('Celestial Collection', 4999)">PRE-ORDER NOW ($4,999)</button>
+
+                        <button class="border border-gold text-gold font-bold py-3 px-8 rounded-full hover:bg-gold hover:text-dark transition-colors">
+                            LEARN MORE
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Shop by Mood -->
+    <section id="mood" class="section py-20 relative">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl md:text-5xl font-bold gold-text mb-16 text-center">Shop by Mood</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Mood 1 -->
+                <div class="mood-card h-80 rounded-lg relative" style="background-image: url('./6d2fdf2704fdc52232976b4ba3d51c87.jpg');">
+                    <div class="absolute bottom-0 left-0 right-0 p-6 z-10">
+                        <h3 class="mood-title text-2xl font-bold text-beige">Evening Glam</h3>
+                        <p class="text-beige opacity-0 group-hover:opacity-100 transition-opacity">For your most dazzling nights</p>
+                    </div>
+                </div>
+                
+                <!-- Mood 2 -->
+                <div class="mood-card h-80 rounded-lg relative" style="background-image: url('./7857a6a7ed12e9a93ac225bc430385fc.jpg');">
+                    <div class="absolute bottom-0 left-0 right-0 p-6 z-10">
+                        <h3 class="mood-title text-2xl font-bold text-beige">Business Chic</h3>
+                        <p class="text-beige opacity-0 group-hover:opacity-100 transition-opacity">Powerful and polished</p>
+                    </div>
+                </div>
+                
+                <!-- Mood 3 -->
+                <div class="mood-card h-80 rounded-lg relative" style="background-image: url('./9992b3ca20621f2a6c8db266ad9bc479.jpg');">
+                    <div class="absolute bottom-0 left-0 right-0 p-6 z-10">
+                        <h3 class="mood-title text-2xl font-bold text-beige">Weekend Escape</h3>
+                        <p class="text-beige opacity-0 group-hover:opacity-100 transition-opacity">Casual sophistication</p>
+                    </div>
+                </div>
+                
+                <!-- Mood 4 -->
+                <div class="mood-card h-80 rounded-lg relative" style="background-image: url('./f6585f49eb6e37ccb53a6e20cc4b2960.jpg');">
+                    <div class="absolute bottom-0 left-0 right-0 p-6 z-10">
+                        <h3 class="mood-title text-2xl font-bold text-beige">Special Occasion</h3>
+                        <p class="text-beige opacity-0 group-hover:opacity-100 transition-opacity">For life's milestones</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="py-32 relative overflow-hidden">
+        <div class="absolute inset-0 bg-black opacity-60"></div>
+        <img src="./background.jpg" alt="" class="absolute inset-0 w-full h-full object-cover">
+        
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <h2 class="text-4xl md:text-6xl font-bold gold-text mb-8">Join Our Exclusive List</h2>
+            <p class="text-xl mb-12 max-w-2xl mx-auto">Be the first to access new collections, private sales, and VIP events.</p>
+            
+            <div class="max-w-md mx-auto flex">
+                <input type="email" placeholder="Your email address" class="flex-grow bg-black bg-opacity-50 border border-gold text-beige py-4 px-6 rounded-l-full focus:outline-none focus:ring-2 focus:ring-gold">
+                <button class="btn-glow bg-gold text-dark font-bold py-4 px-8 rounded-r-full hover:bg-opacity-90 transition-all duration-300">
+                    SUBSCRIBE
+                </button>
+            </div>
+        </div>
+    </section>
+    <!-- Footer -->
+    <footer class="bg-black py-16">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                <div>
+                    <h3 class="text-2xl font-bold gold-text mb-6">LUXE</h3>
+                    <p class="text-beige mb-6">Crafting timeless luxury since 1985. Each piece tells a story of exquisite craftsmanship and unparalleled quality.</p>
+                    <div class="flex space-x-4">
+                        <i class="fab fa-instagram text-beige hover:text-gold cursor-pointer text-xl"></i>
+                        <i class="fab fa-pinterest text-beige hover:text-gold cursor-pointer text-xl"></i>
+                        <i class="fab fa-twitter text-beige hover:text-gold cursor-pointer text-xl"></i>
+                        <i class="fab fa-facebook text-beige hover:text-gold cursor-pointer text-xl"></i>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-beige font-bold mb-6">SHOP</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-beige hover:text-gold">New Arrivals</a></li>
+                        <li><a href="#" class="text-beige hover:text-gold">Bestsellers</a></li>
+                        <li><a href="#" class="text-beige hover:text-gold">Limited Edition</a></li>
+                        <li><a href="#" class="text-beige hover:text-gold">Sale</a></li>
+                        <li><a href="#" class="text-beige hover:text-gold">Gift Cards</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-beige font-bold mb-6">ABOUT</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-beige hover:text-gold">Our Story</a></li>
+                        <li><a href="#" class="text-beige hover:text-gold">Craftsmanship</a></li>
+                        <li><a href="#" class="text-beige hover:text-gold">Materials</a></li>
+                        <li><a href="#" class="text-beige hover:text-gold">Sustainability</a></li>
+                        <li><a href="#" class="text-beige hover:text-gold">Careers</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-beige font-bold mb-6">CUSTOMER CARE</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-beige hover:text-gold">Contact Us</a></li>
+                        <li><a href="#" class="text-beige hover:text-gold">FAQs</a></li>
+                        <li><a href="#" class="text-beige hover:text-gold">Shipping & Returns</a></li>
+                        <li><a href="#" class="text-beige hover:text-gold">Product Care</a></li>
+                        <li><a href="#" class="text-beige hover:text-gold">Store Locator</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-beige text-sm mb-4 md:mb-0">© 2023 LUXE. All rights reserved.</p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-beige hover:text-gold text-sm">Privacy Policy</a>
+                    <a href="#" class="text-beige hover:text-gold text-sm">Terms of Service</a>
+                    <a href="#" class="text-beige hover:text-gold text-sm">Accessibility</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+<script>
+    // Initialize Three.js for 3D bag
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if Three.js is loaded
+        if (typeof THREE !== 'undefined') {
+            init3DBag();
+        }
+
+        // Initialize GSAP scroll animations
+        initAnimations();
+
+        // Parallax effect for floating bags
+        initParallax();
+    });
+
+    function init3DBag() {
+        const container = document.getElementById('canvas-container');
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xD4AF37, 1);
+        directionalLight.position.set(1, 1, 1);
+        scene.add(directionalLight);
+
+        const pointLight = new THREE.PointLight(0xD4AF37, 1, 100);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+
+        // Bag model
+        const geometry = new THREE.BoxGeometry(2, 3, 1);
+        const edges = new THREE.EdgesGeometry(geometry);
+        const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xD4AF37 }));
+
+        const material = new THREE.MeshPhongMaterial({ 
+            color: 0x333333,
+            specular: 0xD4AF37,
+            shininess: 100,
+            wireframe: false
+        });
+
+        const bag = new THREE.Mesh(geometry, material);
+        scene.add(bag);
+        scene.add(line);
+
+        camera.position.z = 5;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            bag.rotation.x += 0.005;
+            bag.rotation.y += 0.01;
+            line.rotation.copy(bag.rotation);
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    }
+
+    function initAnimations() {
+        // Use GSAP with ScrollTrigger for scroll animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Animate sections as they come into view
+        gsap.utils.toArray('.section').forEach(section => {
+            gsap.from(section, {
+                scrollTrigger: {
+                    trigger: section,
+                    start: "top 80%",
+                    toggleActions: "play none none none"
+                },
+                opacity: 0,
+                y: 50,
+                duration: 1
+            });
+        });
+
+        // Animate product cards
+        gsap.utils.toArray('.product-card').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 80%",
+                    toggleActions: "play none none none"
+                },
+                opacity: 0,
+                y: 50,
+                duration: 0.8,
+                delay: i * 0.1
+            });
+        });
+
+        // Animate mood cards
+        gsap.utils.toArray('.mood-card').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 80%",
+                    toggleActions: "play none none none"
+                },
+                opacity: 0,
+                scale: 0.9,
+                duration: 0.8,
+                delay: i * 0.1
+            });
+        });
+    }
+
+    function initParallax() {
+        const floatingBags = document.getElementById('floating-bags');
+
+        window.addEventListener('mousemove', function(e) {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+
+            const bags = floatingBags.querySelectorAll('img');
+            bags.forEach((bag, index) => {
+                const multiplierX = 0.05 * (index + 1);
+                const multiplierY = 0.05 * (index + 1);
+
+                const moveX = (x - 0.5) * 100 * multiplierX;
+                const moveY = (y - 0.5) * 100 * multiplierY;
+
+                gsap.to(bag, {
+                    x: moveX,
+                    y: moveY,
+                    duration: 1.5,
+                    ease: "power2.out"
+                });
+            });
+        });
+    }
+
+    // 🌟 Add-to-Cart & Pre-order logic here:
+    function openOrderPage(productName, price) {
+        const url = `order.html?name=${encodeURIComponent(productName)}&price=${price}`;
+        window.open(url, '_blank');
+    }
+</script>
+
+</html>
